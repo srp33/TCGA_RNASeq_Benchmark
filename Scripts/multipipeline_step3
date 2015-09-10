@@ -1,0 +1,60 @@
+#!/bin/bash
+
+set -o errexit
+
+sampleID=$1
+analysisID=$2
+fastqDir=$3
+
+currentDir=$(pwd)
+
+if [ -f FASTQ/${sampleID}_1.fq ]
+then
+  echo FASTQ/${sampleID}_1.fq already exists
+  exit 0
+fi
+
+function cleanup {
+  rm -rfv $fastqDir
+  rm -rfv $fastqDir.gto
+}
+
+trap 'cleanup' TERM INT EXIT
+
+mkdir -p $fastqDir/$sampleID
+
+echo Rename and extract files $sampleID
+if [ -f $fastqDir/*.tar.gz ]
+then
+  mv -v $fastqDir/*.tar.gz $fastqDir/$sampleID.tar.gz
+  tar -zxvf $fastqDir/$sampleID.tar.gz -C $fastqDir/$sampleID
+  rm -fv $fastqDir/$sampleID.tar.gz
+else
+  mv -v $fastqDir/*.tar $fastqDir/$sampleID.tar
+  tar -xvf $fastqDir/$sampleID.tar -C $fastqDir/$sampleID
+  rm -fv $fastqDir/$sampleID.tar
+fi
+
+fastqFileNamesFile=$fastqDir/$sampleID/FASTQFiles
+for f in $fastqDir/$sampleID/*fastq* NULL
+do
+  echo $f >> $fastqFileNamesFile
+done
+
+fastqFilePath1=$(head -n 1 $fastqFileNamesFile)
+fastqFilePath2=$(head -n 2 $fastqFileNamesFile | tail -n 1)
+
+mkdir -p FASTQ
+mv -v $fastqFilePath1 FASTQ/${sampleID}_1.fq
+fastqFilePath1=FASTQ/${sampleID}_1.fq
+if [ "$fastqFilePath2" != "" ]
+then
+  mv -v $fastqFilePath2 FASTQ/${sampleID}_2.fq
+  fastqFilePath2=FASTQ/${sampleID}_2.fq
+fi
+
+##outFile=$currentDir/UnalignedBAM/$sampleID.bam
+##mkdir -p UnalignedBAM
+##java -Xmx16g -jar /Software/picard-tools-1.137/picard.jar FastqToSam FASTQ=$fastqFilePath1 FASTQ2=$fastqFilePath2 SAMPLE_NAME=$sampleID OUTPUT=$outFile
+
+echo "./Scripts/multipipeline_step4 $fastqFilePath1 $fastqFilePath2" >> CommandsToExecute/multipipeline_step4

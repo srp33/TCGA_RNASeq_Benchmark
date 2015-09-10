@@ -1,0 +1,40 @@
+#!/bin/bash
+
+set -o errexit
+
+sampleIDFile=$1
+outCommandFile1=$2
+outCommandFile2=$3
+
+tcgaID=$(basename $sampleIDFile)
+analysisID=$(cat $sampleIDFile)
+
+currentDir=$(pwd)
+fastqDir=$currentDir/TempNormal/FASTQ
+outFpkmDir=$currentDir/FPKMNormal
+outTpmDir=$currentDir/TPMNormal
+outFeatureCountsDir=$currentDir/FeatureCountsNormal
+outStatsDir=$currentDir/StatsNormal
+inProgressFile=$currentDir/InProgressNormal/$tcgaID
+
+rm -fv $inProgressFile
+touch $inProgressFile
+
+function cleanup {
+  rm -rfv $fastqDir/${analysisID}*
+  rm -rfv $fastqDir/${tcgaID}*
+  rm -fv $inProgressFile
+}
+
+#trap 'cleanup' TERM INT EXIT
+trap 'cleanup' TERM INT
+
+mkdir -pv $fastqDir/$tcgaID $outFpkmDir $outFpkmLogDir $outTpmDir $outTpmLogDir $outFeatureCountsDir $outStatsDir
+
+echo Downloading $tcgaID
+mkdir -p $currentDir/XmlFilesNormal
+cgquery -o $currentDir/XmlFilesNormal/$tcgaID.xml -a "state=live&library_strategy=RNA-Seq&filetype=fasta&analysis_id=${analysisID}"
+gtdownload -vv -d $currentDir/XmlFilesNormal/$tcgaID.xml -c $currentDir/cghub.key --max-children 6 -p $fastqDir
+rm -fv $currentDir/XmlFilesNormal/$tcgaID.xml
+
+echo "$currentDir/Scripts/normalize_tcga_rsubread_normal2b $fastqDir $analysisID $tcgaID $outCommandFile2" >> $outCommandFile1

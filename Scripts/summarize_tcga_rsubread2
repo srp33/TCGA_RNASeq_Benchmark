@@ -1,0 +1,57 @@
+#!/bin/bash
+
+set -o errexit
+
+function buildCancerTypesFile {
+  rm -rf Temp/CancerTypes
+  mkdir -p Temp/CancerTypes
+
+  for f in FeatureCounts/*
+  do
+    sampleID=$(basename $f)
+    sampleCancerType=$(cat CancerTypes/$sampleID)
+
+    cp -v CancerTypes/$sampleID Temp/CancerTypes/
+  done
+
+  python Codes/CombineScalarValues.py "Temp/CancerTypes/*" PANCAN25_CancerType_Samples.txt
+
+  rm -rf Temp/CancerTypes
+}
+
+function matricize {
+  subDir=$1
+  outDescription=$2
+
+  tempSummDir=Temp/Summarize_${subDir}
+  rm -rf $tempSummDir
+  mkdir -p $tempSummDir
+
+  for f in $subDir/*
+  do
+    sampleID=$(basename $f)
+    sampleCancerType=$(cat CancerTypes/$sampleID)
+
+    cp -v $f $tempSummDir/
+  done
+
+  outFile=matrices/PANCAN25.IlluminaHiSeq_RNASeqV2.tumor_${outDescription}.txt
+
+  python Codes/BuildMatrixFile.py "$tempSummDir/*" $outFile
+  python Codes/PrintMatrixDimensions.py $outFile
+
+  rm -f $outFile.gz
+
+  echo Zipping $outFile
+  gzip -v $outFile
+
+  rm -rf $tempSummDir
+}
+
+buildCancerTypesFile
+
+#mkdir -p matrices
+
+matricize iGenomes_2012/Gene/FeatureCounts Rsubread_iGenomes2012_Gene_FeatureCounts
+matricize iGenomes_2012/Gene/FPKM Rsubread_iGenomes2012_FPKM_FeatureCounts
+matricize iGenomes_2012/Gene/TPM Rsubread_iGenomes2012_TPM_FeatureCounts

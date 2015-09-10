@@ -1,0 +1,39 @@
+#!/bin/bash
+
+set -o errexit
+
+fastqDir=$1
+analysisID=$2
+tcgaID=$3
+outCommandFile=$4
+
+currentDir=$(pwd)
+outFpkmDir=$currentDir/FPKMNormal
+outTpmDir=$currentDir/TPMNormal
+outFeatureCountsDir=$currentDir/FeatureCountsNormal
+outStatsDir=$currentDir/StatsNormal
+inProgressFile=$currentDir/InProgressNormal/$tcgaID
+
+if [ -f $fastqDir/$analysisID/*.tar.gz ]
+then
+  mv -v $fastqDir/$analysisID/*.tar.gz $fastqDir/$tcgaID.tar.gz
+  tar -zxvf $fastqDir/$tcgaID.tar.gz -C $fastqDir/$tcgaID
+  rm -fv $fastqDir/$tcgaID.tar.gz
+else
+  mv -v $fastqDir/$analysisID/*.tar $fastqDir/$tcgaID.tar
+  tar -xvf $fastqDir/$tcgaID.tar -C $fastqDir/$tcgaID
+  rm -fv $fastqDir/$tcgaID.tar
+fi
+
+rm -rfv $fastqDir/${analysisID}*
+
+fastqFileNamesFile=$fastqDir/$tcgaID/FASTQFiles
+for f in $fastqDir/$tcgaID/*fastq* NULL
+do
+  echo $f >> $fastqFileNamesFile
+done
+
+fastqFilePath1=$(head -n 1 $fastqFileNamesFile)
+fastqFilePath2=$(head -n 2 $fastqFileNamesFile | tail -n 1)
+
+echo "Rscript --vanilla $currentDir/Codes/ProcessRnaSeqFeatureCounts2.R $currentDir/Genome/iGenomes_2012/genome.fa $fastqFilePath1 $fastqFilePath2 $currentDir/Genome/iGenomes_2012/genes.gtf $fastqDir/$tcgaID $outFpkmDir/$tcgaID $outTpmDir/$tcgaID $outFeatureCountsDir/$tcgaID $outStatsDir/$tcgaID; rm -rfv $fastqDir/${tcgaID}*; rm -fv $inProgressFile" >> $outCommandFile

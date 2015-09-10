@@ -1,0 +1,48 @@
+#!/bin/bash
+
+#set -o errexit
+
+#mkdir -p DownloadSamples CancerTypes Temp FeatureCounts InProgress
+
+#for cancerType in $(cat TCGA_CancerType_Publishable.txt)
+#do
+#  cgquery -o Query_${cancerType}.xml -a "state=live&library_strategy=RNA-Seq&filetype=fasta&sample_type=0*&study=phs000178&disease_abbr=${cancerType}"
+#done
+
+#rm -rfv DownloadSamples/* CancerTypes/*
+
+#for f in Query*.xml
+#do
+#  python Codes/ParseCgHubQueryResults.py $f "" DownloadSamples CancerTypes
+#done
+
+rm -rfv Temp/*
+
+for f in $(pwd)/DownloadSamples/*
+do
+  sampleID=$(basename $f)
+  sampleID=${sampleID/\.xml/}
+  analysisID=$(cat $f)
+
+  if [ -f FeatureCounts/$sampleID ]
+  then
+    echo $sampleID already processed
+    continue
+  fi
+
+  if [ -f InProgress/$sampleID ]
+  then
+    echo $sampleID currently being processed
+    continue
+  fi
+
+  if [ -f Temp/FASTQ/$analysisID.gto ]
+  then
+    echo $sampleID already downloaded
+    continue
+  fi
+
+  $(pwd)/Scripts/multipipeline_step2 $f
+done
+
+echo Done

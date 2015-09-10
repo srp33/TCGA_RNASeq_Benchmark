@@ -1,0 +1,33 @@
+#!/bin/bash
+
+#mkdir -p DownloadSamplesNormal CancerTypesNormal TempNormal FeatureCountsNormal InProgressNormal
+
+#set -o errexit
+
+#cgquery -o Query_Normal.xml -a "state=live&library_strategy=RNA-Seq&filetype=fasta&sample_type=1*&study=phs000178"
+
+#rm -rfv DownloadSamplesNormal/* CancerTypesNormal/*
+
+#python Codes/ParseCgHubQueryResults.py Query_Normal.xml "" DownloadSamplesNormal CancerTypesNormal
+
+#rm -rf TempNormal/*
+
+#rm -f temp_parallel_normal
+
+for f in $(pwd)/DownloadSamplesNormal/*
+do
+  sampleID=$(basename $f)
+  sampleID=${sampleID/\.xml/}
+
+  if [ -f FeatureCountsNormal/$sampleID ]
+  then
+    continue
+  fi
+
+  if [ -f InProgressNormal/$sampleID ]
+  then
+    continue
+  fi
+
+  $(pwd)/Scripts/normalize_tcga_rsubread_normal $f temp_parallel_normal
+done

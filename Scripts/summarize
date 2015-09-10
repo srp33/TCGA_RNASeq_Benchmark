@@ -1,0 +1,77 @@
+#!/bin/bash
+
+set -o errexit
+
+function buildCancerTypesFile {
+  rm -rf Temp/CancerTypes
+  mkdir -p Temp/CancerTypes
+
+  for f in FeatureCounts/*
+  do
+    sampleID=$(basename $f)
+    sampleCancerType=$(cat CancerTypes/$sampleID)
+
+    cp -v CancerTypes/$sampleID Temp/CancerTypes/
+  done
+
+  python Codes/CombineScalarValues.py "Temp/CancerTypes/*" PANCAN25_CancerType_Samples.txt
+
+  rm -rf Temp/CancerTypes
+}
+
+function matricize {
+  subDir=$1
+  outFile=$2
+
+  tempSummDir=Temp/Summarize_${subDir}
+  rm -rf $tempSummDir
+  mkdir -p $tempSummDir
+
+  for f in $subDir/*
+  do
+    sampleID=$(basename $f)
+    sampleCancerType=$(cat CancerTypes/$sampleID)
+
+    cp -v $f $tempSummDir/
+  done
+
+  python Codes/BuildMatrixFile.py "$tempSummDir/*" $outFile
+  python Codes/PrintMatrixDimensions.py $outFile
+
+  rm -f $outFile.gz
+
+  echo Zipping $outFile
+  gzip -v $outFile
+
+  rm -rf $tempSummDir
+}
+
+#buildCancerTypesFile
+
+#mkdir -p matrices
+
+#matricize iGenomes_2012/Gene/FeatureCounts matrices/PANCAN25.IlluminaHiSeq_RNASeqV2.tumor_Rsubread_iGenomes2012_Gene_FeatureCounts.txt
+#matricize iGenomes_2012/Gene/FPKM matrices/PANCAN25.IlluminaHiSeq_RNASeqV2.tumor_Rsubread_iGenomes2012_FPKM_FeatureCounts.txt
+#matricize iGenomes_2012/Gene/TPM matrices/PANCAN25.IlluminaHiSeq_RNASeqV2.tumor_Rsubread_iGenomes2012_TPM_FeatureCounts.txt
+
+
+#matricize EduardoEyras/Transcript/FeatureCounts matrices/UCSC_Transcript_Counts_Rsubread.txt
+#matricize EduardoEyras/Transcript/TPM matrices/UCSC_Transcript_TPM_Rsubread.txt
+#matricize EduardoEyras/Transcript/FPKM matrices/UCSC_Transcript_FPKM_Rsubread.txt
+
+#matricize GENCODE_19/Transcript/FeatureCounts matrices/GENCODE_Transcript_Counts_Rsubread.txt
+matricize GENCODE_19/Transcript/TPM matrices/GENCODE_Transcript_TPM_Rsubread.txt
+matricize GENCODE_19/Transcript/FPKM matrices/GENCODE_Transcript_FPKM_Rsubread.txt
+exit
+
+for ref in UCSC GENCODE
+do
+  #python Codes/ParseSalmonValues.py EduardoEyras/Salmon/$ref
+  #python Codes/ParseKallistoValues.py EduardoEyras/Kallisto/$ref
+
+  matricize EduardoEyras/Salmon/$ref/Counts matrices/${ref}_Transcript_Counts_Salmon.txt
+  matricize EduardoEyras/Salmon/$ref/TPM matrices/${ref}_Transcript_TPM_Salmon.txt
+  matricize EduardoEyras/Salmon/$ref/FPKM matrices/${ref}_Transcript_FPKM_Salmon.txt
+  matricize EduardoEyras/Kallisto/$ref/Counts matrices/${ref}_Transcript_Counts_Kallisto.txt
+  matricize EduardoEyras/Kallisto/$ref/TPM matrices/${ref}_Transcript_TPM_Kallisto.txt
+done

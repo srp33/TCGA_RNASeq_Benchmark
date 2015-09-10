@@ -1,0 +1,8 @@
+#!/bin/bash
+
+set -o errexit
+
+bamFile=$1
+numLines=$2
+
+/Software/samtools-1.2/samtools view -h $bamFile | head -n $numLines

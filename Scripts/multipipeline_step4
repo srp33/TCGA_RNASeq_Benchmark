@@ -1,0 +1,61 @@
+#!/bin/bash
+
+set -o errexit
+
+fastqFile1="$1"
+fastqFile2="$2"
+
+sampleID=$(basename ${fastqFile1/_1\.fq/})
+
+mkdir -pv BAMtemp
+#rm -rfv BAMtemp/${sampleID}
+
+#mkdir -pv Timer/Rsubread/UCSC Timer/Salmon/UCSC Timer/Kallisto/UCSC Timer/Rsubread/UCSC
+mkdir -pv Timer/Rsubread/GENCODE Timer/Salmon/GENCODE Timer/Kallisto/GENCODE Timer/Rsubread/GENCODE
+#mkdir -pv StdOut/Rsubread/UCSC StdOut/Salmon/UCSC StdOut/Kallisto/UCSC StdOut/Rsubread/UCSC
+mkdir -pv StdOut/Rsubread/GENCODE StdOut/Salmon/GENCODE StdOut/Kallisto/GENCODE StdOut/Rsubread/GENCODE
+#rm -fv StdOut/Salmon/*/$sampleID StdOut/Kallisto/*/$sampleID StdOut/Rsubread/*/$sampleID
+#rm -fv Timer/Salmon/*/$sampleID Timer/Kallisto/*/$sampleID Timer/Rsubread/*/$sampleID
+mkdir -pv EduardoEyras/Salmon/UCSC/$sampleID EduardoEyras/Salmon/GENCODE/$sampleID
+mkdir -pv EduardoEyras/Kallisto/UCSC/$sampleID EduardoEyras/Kallisto/GENCODE/$sampleID
+
+#rm -fv BAMtemp/$sampleID.bam*
+#Rscript --vanilla Codes/ProcessRnaSeqFeatureCounts3.R $sampleID Genome/iGenomes_2012/genome.fa "$fastqFile1" "$fastqFile2" Genome/iGenomes_2012/genes.gtf gene_id BAMtemp/$sampleID.bam iGenomes_2012/Gene
+#Rscript --vanilla Codes/ProcessRnaSeqFeatureCounts3.R $sampleID Genome/iGenomes_2012/genome.fa "$fastqFile1" "$fastqFile2" Genome/iGenomes_2012/genes.gtf transcript_id BAMtemp/$sampleID.bam iGenomes_2012/Transcript
+#Rscript --vanilla Codes/ProcessRnaSeqFeatureCounts3.R $sampleID Genome/iGenomes_2012/genome.fa "$fastqFile1" "$fastqFile2" Genome/iGenomes_2012/genes_plusexons.gtf exon_id BAMtemp/$sampleID.bam iGenomes_2012/Exon
+#rm -fv BAMtemp/$sampleID.bam*
+
+#rm -fv BAMtemp/$sampleID.bam*
+#Rscript --vanilla Codes/ProcessRnaSeqSubjunc.R $sampleID Genome/iGenomes_2012/genome.fa "$fastqFile1" "$fastqFile2" BAMtemp/$sampleID.bam EduardoEyras
+#rm -fv BAMtemp/$sampleID.bam*
+#{ time Rscript --vanilla Codes/ProcessRnaSeqFeatureCounts3.R $sampleID Genome/iGenomes_2012/genome.fa "$fastqFile1" "$fastqFile2" Genome/EduardoEyras/refseq_annotation_hg19.formatted.nohap.processed.gtf transcript_id BAMtemp/$sampleID.bam EduardoEyras/Transcript > StdOut/Rsubread/UCSC/$sampleID 2>&1 ; } 2> Timer/Rsubread/UCSC/$sampleID
+#Rscript --vanilla Codes/ProcessRnaSeqFeatureCounts3.R $sampleID Genome/iGenomes_2012/genome.fa "$fastqFile1" "$fastqFile2" Genome/EduardoEyras/refseq_annotation_hg19.formatted.nohap.processed.gtf gene_id BAMtemp/$sampleID.bam EduardoEyras/Gene
+#Rscript --vanilla Codes/ProcessRnaSeqFeatureCounts3.R $sampleID Genome/iGenomes_2012/genome.fa "$fastqFile1" "$fastqFile2" Genome/EduardoEyras/refseq_annotation_hg19.formatted.nohap.processed_plusexons.gtf exon_id BAMtemp/$sampleID.bam EduardoEyras/Exon
+#rm -fv BAMtemp/$sampleID.bam*
+
+#rm -fv BAMtemp/$sampleID.bam*
+#Rscript --vanilla Codes/ProcessRnaSeqSubjunc.R $sampleID Genome/GENCODE_19/GRCh37.p13.genome.fa "$fastqFile1" "$fastqFile2" BAMtemp/$sampleID.bam GENCODE_19
+#rm -fv BAMtemp/$sampleID.bam*
+#Rscript --vanilla Codes/ProcessRnaSeqFeatureCounts3.R $sampleID Genome/GENCODE_19/GRCh37.p13.genome.fa "$fastqFile1" "$fastqFile2" Genome/GENCODE_19/gencode.v19.annotation.gtf gene_id BAMtemp/$sampleID.bam GENCODE_19/Gene
+#Rscript --vanilla Codes/ProcessRnaSeqFeatureCounts3.R $sampleID Genome/GENCODE_19/GRCh37.p13.genome.fa "$fastqFile1" "$fastqFile2" Genome/GENCODE_19/gencode.v19.annotation.gtf transcript_id BAMtemp/$sampleID.bam GENCODE_19/Transcript
+#Rscript --vanilla Codes/ProcessRnaSeqFeatureCounts3.R $sampleID Genome/GENCODE_19/GRCh37.p13.genome.fa "$fastqFile1" "$fastqFile2" Genome/GENCODE_19/gencode.v19.annotation_plusexons.gtf exon_id BAMtemp/$sampleID.bam GENCODE_19/Exon
+#rm -fv BAMtemp/$sampleID.bam*
+
+if [ "$fastqFile2" == "" ]
+then
+  echo "Running Salmon for $sampleID (single-end reads)"
+#  { time /Software/SalmonBeta-v0.3.0_ubuntu-14.04/bin/salmon quant -i Genome/EduardoEyras/refseq_sequence_mrna_Nov2014_index -l IU -p 2 -r "$fastqFile1" -o EduardoEyras/Salmon/UCSC/$sampleID > StdOut/Salmon/UCSC/$sampleID 2>&1 ; } 2> Timer/Salmon/UCSC/$sampleID
+  { time /Software/SalmonBeta-v0.3.0_ubuntu-14.04/bin/salmon quant -i Genome/GENCODE_19/gencode.v19.pc_lncRNA_transcripts_index -l IU -p 2 -r "$fastqFile1" -o EduardoEyras/Salmon/GENCODE/$sampleID > StdOut/Salmon/GENCODE/$sampleID 2>&1 ; } 2> Timer/Salmon/GENCODE/$sampleID
+#  echo "Running Kallisto for $sampleID (single-end reads)"
+#  { time /Software/kallisto/build/src/kallisto quant -i Genome/EduardoEyras/refseq_sequence_mrna_Nov2014_kallisto -b 30 -t 2 --single -o EduardoEyras/Kallisto/UCSC/$sampleID $fastqFile1 > StdOut/Kallisto/UCSC/$sampleID 2>&1 ; } 2> Timer/Kallisto/UCSC/$sampleID
+#  { time /Software/kallisto/build/src/kallisto quant -i Genome/GENCODE_19/gencode.v19.pc_lncRNA_transcripts_kallisto -b 30 -t 2 --single -o EduardoEyras/Kallisto/GENCODE/$sampleID $fastqFile1 > StdOut/Kallisto/GENCODE/$sampleID 2>&1 ; } 2> Timer/Kallisto/GENCODE/$sampleID
+else
+  echo "Running Salmon for $sampleID (paired-end reads)"
+#  { time /Software/SalmonBeta-v0.3.0_ubuntu-14.04/bin/salmon quant -i Genome/EduardoEyras/refseq_sequence_mrna_Nov2014_index -l IU -p 2 -1 "$fastqFile1" -2 "$fastqFile2" -o EduardoEyras/Salmon/UCSC/$sampleID > StdOut/Salmon/UCSC/$sampleID 2>&1 ; } 2> Timer/Salmon/UCSC/$sampleID
+  { time /Software/SalmonBeta-v0.3.0_ubuntu-14.04/bin/salmon quant -i Genome/GENCODE_19/gencode.v19.pc_lncRNA_transcripts_index -l IU -p 2 -1 "$fastqFile1" -2 "$fastqFile2" -o EduardoEyras/Salmon/GENCODE/$sampleID > StdOut/Salmon/GENCODE/$sampleID 2>&1 ; } 2> Timer/Salmon/GENCODE/$sampleID
+#  echo "Running Kallisto for $sampleID (paired-end reads)"
+#  { time /Software/kallisto/build/src/kallisto quant -i Genome/EduardoEyras/refseq_sequence_mrna_Nov2014_kallisto -b 30 -t 2 -o EduardoEyras/Kallisto/UCSC/$sampleID $fastqFile1 $fastqFile2 > StdOut/Kallisto/UCSC/$sampleID 2>&1 ; } 2> Timer/Kallisto/UCSC/$sampleID
+#  { time /Software/kallisto/build/src/kallisto quant -i Genome/GENCODE_19/gencode.v19.pc_lncRNA_transcripts_kallisto -b 30 -t 2 -o EduardoEyras/Kallisto/GENCODE/$sampleID $fastqFile1 $fastqFile2 > StdOut/Kallisto/GENCODE/$sampleID 2>&1 ; } 2> Timer/Kallisto/GENCODE/$sampleID
+fi
+
+#rm -rfv $fastqFile1 $fastqFile2

@@ -1,0 +1,3 @@
+#!/bin/bash
+
+tail -n+0 -f CommandsToExecute/multipipeline_step3 | parallel --ungroup --max-procs 2

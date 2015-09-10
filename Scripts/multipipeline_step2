@@ -1,0 +1,21 @@
+#!/bin/bash
+
+set -o errexit
+
+sampleIDFile=$1
+
+sampleID=$(basename $sampleIDFile)
+analysisID=$(cat $sampleIDFile)
+
+currentDir=$(pwd)
+fastqDir=$currentDir/Temp/FASTQ
+
+mkdir -p $fastqDir
+
+echo Downloading $sampleID
+mkdir -p $currentDir/XmlFiles
+cgquery -o $currentDir/XmlFiles/$sampleID.xml -a "state=live&library_strategy=RNA-Seq&filetype=fasta&analysis_id=${analysisID}"
+gtdownload -vv -d $currentDir/XmlFiles/$sampleID.xml -c $currentDir/cghub.key --max-children 9 -p $fastqDir
+rm -fv $currentDir/XmlFiles/$sampleID.xml
+
+echo "./Scripts/multipipeline_step3 $sampleID $analysisID $fastqDir/$analysisID" >> CommandsToExecute/multipipeline_step3
