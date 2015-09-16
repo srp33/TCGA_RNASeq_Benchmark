@@ -60,18 +60,17 @@ function matricize {
 #matricize EduardoEyras/Transcript/FPKM matrices/UCSC_Transcript_FPKM_Rsubread.txt
 
 #matricize GENCODE_19/Transcript/FeatureCounts matrices/GENCODE_Transcript_Counts_Rsubread.txt
-matricize GENCODE_19/Transcript/TPM matrices/GENCODE_Transcript_TPM_Rsubread.txt
-matricize GENCODE_19/Transcript/FPKM matrices/GENCODE_Transcript_FPKM_Rsubread.txt
-exit
+#matricize GENCODE_19/Transcript/TPM matrices/GENCODE_Transcript_TPM_Rsubread.txt
+#matricize GENCODE_19/Transcript/FPKM matrices/GENCODE_Transcript_FPKM_Rsubread.txt
 
 for ref in UCSC GENCODE
 do
   #python Codes/ParseSalmonValues.py EduardoEyras/Salmon/$ref
   #python Codes/ParseKallistoValues.py EduardoEyras/Kallisto/$ref
 
-  matricize EduardoEyras/Salmon/$ref/Counts matrices/${ref}_Transcript_Counts_Salmon.txt
-  matricize EduardoEyras/Salmon/$ref/TPM matrices/${ref}_Transcript_TPM_Salmon.txt
-  matricize EduardoEyras/Salmon/$ref/FPKM matrices/${ref}_Transcript_FPKM_Salmon.txt
-  matricize EduardoEyras/Kallisto/$ref/Counts matrices/${ref}_Transcript_Counts_Kallisto.txt
-  matricize EduardoEyras/Kallisto/$ref/TPM matrices/${ref}_Transcript_TPM_Kallisto.txt
+#  matricize EduardoEyras/Salmon/$ref/Counts matrices/${ref}_Transcript_Counts_Salmon.txt
+#  matricize EduardoEyras/Salmon/$ref/TPM matrices/${ref}_Transcript_TPM_Salmon.txt
+#  matricize EduardoEyras/Salmon/$ref/FPKM matrices/${ref}_Transcript_FPKM_Salmon.txt
+#  matricize EduardoEyras/Kallisto/$ref/Counts matrices/${ref}_Transcript_Counts_Kallisto.txt
+#  matricize EduardoEyras/Kallisto/$ref/TPM matrices/${ref}_Transcript_TPM_Kallisto.txt
 done

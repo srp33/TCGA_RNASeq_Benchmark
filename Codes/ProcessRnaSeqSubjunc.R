@@ -12,7 +12,7 @@ outBamFilePath = commandArgs()[11]
 outDirPath = commandArgs()[12]
 
 memory = 8000
-nthreads = 2
+nthreads = 12
 
 input_format = "gzFASTQ"
 if (file_ext(inFilePath1) == "bam")
@@ -27,10 +27,10 @@ outFusionFilePath = paste(outDirPath, "/Fusion/", sampleID, sep="")
 for (filePath in c(outBamFilePath, outIndelFilePath, outJunctionFilePath, outFusionFilePath))
   dir.create(dirname(filePath), showWarnings=FALSE, recursive=TRUE)
 
-#if (file.exists(outFusionFilePath))
-#{
-#  print(paste(outFusionFilePath, " already exists, so this sample will not be processed again.", sep=""))
-#} else {
+if (file.exists(outFusionFilePath))
+{
+  print(paste(outFusionFilePath, " already exists, so this sample will not be processed again.", sep=""))
+} else {
   referenceGenomeIndexFilePrefix = paste(referenceGenomeFastaFilePath, "__reference_index", sep="")
 
   if (!file.exists(paste(referenceGenomeIndexFilePrefix, ".reads", sep="")))
@@ -44,6 +44,6 @@ for (filePath in c(outBamFilePath, outIndelFilePath, outJunctionFilePath, outFus
   file.rename(paste(outBamFilePath, ".indel", sep=""), outIndelFilePath)
   file.rename(paste(outBamFilePath, ".junction.bed", sep=""), outJunctionFilePath)
   file.rename(paste(outBamFilePath, ".fusion.txt", sep=""), outFusionFilePath)
-#}
+}
 
 #unlink(outBamFilePath)

@@ -15,7 +15,7 @@ outDirPath = commandArgs()[14]
 orientation = commandArgs()[15]
 
 memory = 8000
-nthreads = 2
+nthreads = 12
 
 input_format = "gzFASTQ"
 if (file_ext(inFilePath1) == "bam")
@@ -34,10 +34,10 @@ outStatsFilePath = paste(outDirPath, "/Stats/", sampleID, sep="")
 for (filePath in c(outBamFilePath, outCountsFilePath, outFpkmFilePath, outTpmFilePath, outStatsFilePath))
   dir.create(dirname(filePath), showWarnings=FALSE, recursive=TRUE)
 
-#if (file.exists(outTpmFilePath))
-#{
-#  print(paste(outTpmFilePath, " already exists, so this sample will not be processed again.", sep=""))
-#} else {
+if (file.exists(outTpmFilePath))
+{
+  print(paste(outTpmFilePath, " already exists, so this sample will not be processed again.", sep=""))
+} else {
   referenceGenomeIndexFilePrefix = paste(referenceGenomeFastaFilePath, "__reference_index", sep="")
 
   if (!file.exists(paste(referenceGenomeIndexFilePrefix, ".reads", sep="")))
@@ -68,4 +68,4 @@ for (filePath in c(outBamFilePath, outCountsFilePath, outFpkmFilePath, outTpmFil
   write.table(cbind(fCountsList$annotation[,1], tpm), outTpmFilePath, sep="\t", col.names=FALSE, row.names=FALSE, quote=FALSE)
 
   unlink(paste(outBamFilePath, ".indel", sep=""))
-#}
+}

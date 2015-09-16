@@ -23,13 +23,14 @@ trap 'cleanup' TERM INT EXIT
 
 mkdir -p $fastqDir/$sampleID
 
-echo Rename and extract files $sampleID
 if [ -f $fastqDir/*.tar.gz ]
 then
+  echo Rename and extract $fastqDir/*.tar.gz
   mv -v $fastqDir/*.tar.gz $fastqDir/$sampleID.tar.gz
   tar -zxvf $fastqDir/$sampleID.tar.gz -C $fastqDir/$sampleID
   rm -fv $fastqDir/$sampleID.tar.gz
 else
+  echo Rename and extract $fastqDir/*.tar
   mv -v $fastqDir/*.tar $fastqDir/$sampleID.tar
   tar -xvf $fastqDir/$sampleID.tar -C $fastqDir/$sampleID
   rm -fv $fastqDir/$sampleID.tar
@@ -52,9 +53,5 @@ then
   mv -v $fastqFilePath2 FASTQ/${sampleID}_2.fq
   fastqFilePath2=FASTQ/${sampleID}_2.fq
 fi
-
-##outFile=$currentDir/UnalignedBAM/$sampleID.bam
-##mkdir -p UnalignedBAM
-##java -Xmx16g -jar /Software/picard-tools-1.137/picard.jar FastqToSam FASTQ=$fastqFilePath1 FASTQ2=$fastqFilePath2 SAMPLE_NAME=$sampleID OUTPUT=$outFile
 
 echo "./Scripts/multipipeline_step4 $fastqFilePath1 $fastqFilePath2" >> CommandsToExecute/multipipeline_step4

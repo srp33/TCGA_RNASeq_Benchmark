@@ -1,22 +1,24 @@
 #!/bin/bash
 
-#set -o errexit
+set -o errexit
 
-#mkdir -p DownloadSamples CancerTypes Temp FeatureCounts InProgress
+mkdir -p DownloadSamples CancerTypes Temp FeatureCounts InProgress
 
-#for cancerType in $(cat TCGA_CancerType_Publishable.txt)
+#rm -rfv DownloadSamples/*
+##rm -rfv CancerTypes/*
+#rm -rfv Temp/*
+#rm -rfv BAMtemp/*
+#rm -rfv FASTQ/*
+#rm -fv CommandsToExecute/multipipeline_step2
+#rm -fv CommandsToExecute/multipipeline_step3
+#rm -fv CommandsToExecute/multipipeline_step4
+
+#for cancerType in BRCA COAD HNSC KICH KIRC KIRP LIHC LUAD LUSC OV PRAD SKCM THCA
+#for cancerType in KICH
 #do
 #  cgquery -o Query_${cancerType}.xml -a "state=live&library_strategy=RNA-Seq&filetype=fasta&sample_type=0*&study=phs000178&disease_abbr=${cancerType}"
+#  python Codes/ParseCgHubQueryResults.py Query_${cancerType}.xml "" DownloadSamples CancerTypes
 #done
-
-#rm -rfv DownloadSamples/* CancerTypes/*
-
-#for f in Query*.xml
-#do
-#  python Codes/ParseCgHubQueryResults.py $f "" DownloadSamples CancerTypes
-#done
-
-rm -rfv Temp/*
 
 for f in $(pwd)/DownloadSamples/*
 do
@@ -24,7 +26,7 @@ do
   sampleID=${sampleID/\.xml/}
   analysisID=$(cat $f)
 
-  if [ -f FeatureCounts/$sampleID ]
+  if [ -f EduardoEyras/Kallisto/GENCODE/$sampleID/abundance.tsv ]
   then
     echo $sampleID already processed
     continue
@@ -42,7 +44,5 @@ do
     continue
   fi
 
-  $(pwd)/Scripts/multipipeline_step2 $f
+  echo "$(pwd)/Scripts/multipipeline_step2 $f" >> CommandsToExecute/multipipeline_step2
 done
-
-echo Done
