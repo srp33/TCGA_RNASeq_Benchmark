@@ -13,7 +13,7 @@
 
 #for f in Query*.xml
 #do
-#  python Codes/ParseCgHubQueryResults.py $f "" DownloadSamples CancerTypes
+#  python code/ParseCgHubQueryResults.py $f "" DownloadSamples CancerTypes
 #done
 
 rm -rf Temp/*
@@ -37,6 +37,6 @@ do
     continue
   fi
 
-  $(pwd)/Scripts/normalize_tcga_rsubread2 $f temp_parallel
+  $(pwd)/scripts/normalize_tcga_rsubread2 $f temp_parallel
 break
 done

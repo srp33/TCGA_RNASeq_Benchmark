@@ -37,4 +37,4 @@ cgquery -o $currentDir/XmlFilesNormal/$tcgaID.xml -a "state=live&library_strateg
 gtdownload -vv -d $currentDir/XmlFilesNormal/$tcgaID.xml -c $currentDir/cghub.key --max-children 6 -p $fastqDir
 rm -fv $currentDir/XmlFilesNormal/$tcgaID.xml
 
-echo "$currentDir/Scripts/normalize_tcga_rsubread_normal2b $fastqDir $analysisID $tcgaID $outCommandFile2" >> $outCommandFile1
+echo "$currentDir/scripts/normalize_tcga_rsubread_normal2b $fastqDir $analysisID $tcgaID $outCommandFile2" >> $outCommandFile1

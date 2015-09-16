@@ -54,4 +54,4 @@ then
   fastqFilePath2=FASTQ/${sampleID}_2.fq
 fi
 
-echo "./Scripts/multipipeline_step4 $fastqFilePath1 $fastqFilePath2" >> CommandsToExecute/multipipeline_step4
+echo "./scripts/multipipeline_step4 $fastqFilePath1 $fastqFilePath2" >> CommandsToExecute/multipipeline_step4

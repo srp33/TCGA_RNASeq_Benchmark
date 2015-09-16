@@ -14,7 +14,7 @@ function buildCancerTypesFile {
     cp -v CancerTypes/$sampleID Temp/CancerTypes/
   done
 
-  python Codes/CombineScalarValues.py "Temp/CancerTypes/*" PANCAN25_CancerType_Samples.txt
+  python code/CombineScalarValues.py "Temp/CancerTypes/*" PANCAN25_CancerType_Samples.txt
 
   rm -rf Temp/CancerTypes
 }
@@ -37,8 +37,8 @@ function matricize {
 
   outFile=matrices/PANCAN25.IlluminaHiSeq_RNASeqV2.tumor_${outDescription}.txt
 
-  python Codes/BuildMatrixFile.py "$tempSummDir/*" $outFile
-  python Codes/PrintMatrixDimensions.py $outFile
+  python code/BuildMatrixFile.py "$tempSummDir/*" $outFile
+  python code/PrintMatrixDimensions.py $outFile
 
   rm -f $outFile.gz
 

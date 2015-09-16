@@ -20,25 +20,25 @@ mkdir -pv EduardoEyras/Salmon/UCSC/$sampleID EduardoEyras/Salmon/GENCODE/$sample
 mkdir -pv EduardoEyras/Kallisto/UCSC/$sampleID EduardoEyras/Kallisto/GENCODE/$sampleID
 
 rm -fv BAMtemp/$sampleID.bam*
-Rscript --vanilla Codes/ProcessRnaSeqFeatureCounts3.R $sampleID Genome/iGenomes_2012/genome.fa "$fastqFile1" "$fastqFile2" Genome/iGenomes_2012/genes.gtf gene_id BAMtemp/$sampleID.bam iGenomes_2012/Gene
-Rscript --vanilla Codes/ProcessRnaSeqFeatureCounts3.R $sampleID Genome/iGenomes_2012/genome.fa "$fastqFile1" "$fastqFile2" Genome/iGenomes_2012/genes.gtf transcript_id BAMtemp/$sampleID.bam iGenomes_2012/Transcript
-Rscript --vanilla Codes/ProcessRnaSeqFeatureCounts3.R $sampleID Genome/iGenomes_2012/genome.fa "$fastqFile1" "$fastqFile2" Genome/iGenomes_2012/genes_plusexons.gtf exon_id BAMtemp/$sampleID.bam iGenomes_2012/Exon
+Rscript --vanilla code/ProcessRnaSeqFeatureCounts3.R $sampleID Genome/iGenomes_2012/genome.fa "$fastqFile1" "$fastqFile2" Genome/iGenomes_2012/genes.gtf gene_id BAMtemp/$sampleID.bam iGenomes_2012/Gene
+Rscript --vanilla code/ProcessRnaSeqFeatureCounts3.R $sampleID Genome/iGenomes_2012/genome.fa "$fastqFile1" "$fastqFile2" Genome/iGenomes_2012/genes.gtf transcript_id BAMtemp/$sampleID.bam iGenomes_2012/Transcript
+Rscript --vanilla code/ProcessRnaSeqFeatureCounts3.R $sampleID Genome/iGenomes_2012/genome.fa "$fastqFile1" "$fastqFile2" Genome/iGenomes_2012/genes_plusexons.gtf exon_id BAMtemp/$sampleID.bam iGenomes_2012/Exon
 rm -fv BAMtemp/$sampleID.bam*
 
-rm -fv BAMtemp/$sampleID.bam*
-Rscript --vanilla Codes/ProcessRnaSeqSubjunc.R $sampleID Genome/iGenomes_2012/genome.fa "$fastqFile1" "$fastqFile2" BAMtemp/$sampleID.bam EduardoEyras
-rm -fv BAMtemp/$sampleID.bam*
-{ time Rscript --vanilla Codes/ProcessRnaSeqFeatureCounts3.R $sampleID Genome/iGenomes_2012/genome.fa "$fastqFile1" "$fastqFile2" Genome/EduardoEyras/refseq_annotation_hg19.formatted.nohap.processed.gtf transcript_id BAMtemp/$sampleID.bam EduardoEyras/Transcript > StdOut/Rsubread/UCSC/$sampleID 2>&1 ; } 2> Timer/Rsubread/UCSC/$sampleID
-Rscript --vanilla Codes/ProcessRnaSeqFeatureCounts3.R $sampleID Genome/iGenomes_2012/genome.fa "$fastqFile1" "$fastqFile2" Genome/EduardoEyras/refseq_annotation_hg19.formatted.nohap.processed.gtf gene_id BAMtemp/$sampleID.bam EduardoEyras/Gene
-Rscript --vanilla Codes/ProcessRnaSeqFeatureCounts3.R $sampleID Genome/iGenomes_2012/genome.fa "$fastqFile1" "$fastqFile2" Genome/EduardoEyras/refseq_annotation_hg19.formatted.nohap.processed_plusexons.gtf exon_id BAMtemp/$sampleID.bam EduardoEyras/Exon
+#Rscript --vanilla code/ProcessRnaSeqSubjunc.R $sampleID Genome/iGenomes_2012/genome.fa "$fastqFile1" "$fastqFile2" BAMtemp/$sampleID.bam EduardoEyras
+#rm -fv BAMtemp/$sampleID.bam*
+
+{ time Rscript --vanilla code/ProcessRnaSeqFeatureCounts3.R $sampleID Genome/iGenomes_2012/genome.fa "$fastqFile1" "$fastqFile2" Genome/EduardoEyras/refseq_annotation_hg19.formatted.nohap.processed.gtf transcript_id BAMtemp/$sampleID.bam EduardoEyras/Transcript > StdOut/Rsubread/UCSC/$sampleID 2>&1 ; } 2> Timer/Rsubread/UCSC/$sampleID
+Rscript --vanilla code/ProcessRnaSeqFeatureCounts3.R $sampleID Genome/iGenomes_2012/genome.fa "$fastqFile1" "$fastqFile2" Genome/EduardoEyras/refseq_annotation_hg19.formatted.nohap.processed.gtf gene_id BAMtemp/$sampleID.bam EduardoEyras/Gene
+Rscript --vanilla code/ProcessRnaSeqFeatureCounts3.R $sampleID Genome/iGenomes_2012/genome.fa "$fastqFile1" "$fastqFile2" Genome/EduardoEyras/refseq_annotation_hg19.formatted.nohap.processed_plusexons.gtf exon_id BAMtemp/$sampleID.bam EduardoEyras/Exon
 rm -fv BAMtemp/$sampleID.bam*
 
-rm -fv BAMtemp/$sampleID.bam*
-Rscript --vanilla Codes/ProcessRnaSeqSubjunc.R $sampleID Genome/GENCODE_19/GRCh37.p13.genome.fa "$fastqFile1" "$fastqFile2" BAMtemp/$sampleID.bam GENCODE_19
-rm -fv BAMtemp/$sampleID.bam*
-Rscript --vanilla Codes/ProcessRnaSeqFeatureCounts3.R $sampleID Genome/GENCODE_19/GRCh37.p13.genome.fa "$fastqFile1" "$fastqFile2" Genome/GENCODE_19/gencode.v19.annotation.gtf gene_id BAMtemp/$sampleID.bam GENCODE_19/Gene
-Rscript --vanilla Codes/ProcessRnaSeqFeatureCounts3.R $sampleID Genome/GENCODE_19/GRCh37.p13.genome.fa "$fastqFile1" "$fastqFile2" Genome/GENCODE_19/gencode.v19.annotation.gtf transcript_id BAMtemp/$sampleID.bam GENCODE_19/Transcript
-Rscript --vanilla Codes/ProcessRnaSeqFeatureCounts3.R $sampleID Genome/GENCODE_19/GRCh37.p13.genome.fa "$fastqFile1" "$fastqFile2" Genome/GENCODE_19/gencode.v19.annotation_plusexons.gtf exon_id BAMtemp/$sampleID.bam GENCODE_19/Exon
+#Rscript --vanilla code/ProcessRnaSeqSubjunc.R $sampleID Genome/GENCODE_19/GRCh37.p13.genome.fa "$fastqFile1" "$fastqFile2" BAMtemp/$sampleID.bam GENCODE_19
+#rm -fv BAMtemp/$sampleID.bam*
+
+Rscript --vanilla code/ProcessRnaSeqFeatureCounts3.R $sampleID Genome/GENCODE_19/GRCh37.p13.genome.fa "$fastqFile1" "$fastqFile2" Genome/GENCODE_19/gencode.v19.annotation.gtf gene_id BAMtemp/$sampleID.bam GENCODE_19/Gene
+Rscript --vanilla code/ProcessRnaSeqFeatureCounts3.R $sampleID Genome/GENCODE_19/GRCh37.p13.genome.fa "$fastqFile1" "$fastqFile2" Genome/GENCODE_19/gencode.v19.annotation.gtf transcript_id BAMtemp/$sampleID.bam GENCODE_19/Transcript
+Rscript --vanilla code/ProcessRnaSeqFeatureCounts3.R $sampleID Genome/GENCODE_19/GRCh37.p13.genome.fa "$fastqFile1" "$fastqFile2" Genome/GENCODE_19/gencode.v19.annotation_plusexons.gtf exon_id BAMtemp/$sampleID.bam GENCODE_19/Exon
 rm -fv BAMtemp/$sampleID.bam*
 
 if [ ! -f EduardoEyras/Kallisto/GENCODE/$sampleID/abundance.tsv ]

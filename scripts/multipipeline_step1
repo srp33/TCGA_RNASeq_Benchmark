@@ -17,7 +17,7 @@ mkdir -p DownloadSamples CancerTypes Temp FeatureCounts InProgress
 #for cancerType in KICH
 #do
 #  cgquery -o Query_${cancerType}.xml -a "state=live&library_strategy=RNA-Seq&filetype=fasta&sample_type=0*&study=phs000178&disease_abbr=${cancerType}"
-#  python Codes/ParseCgHubQueryResults.py Query_${cancerType}.xml "" DownloadSamples CancerTypes
+#  python code/ParseCgHubQueryResults.py Query_${cancerType}.xml "" DownloadSamples CancerTypes
 #done
 
 for f in $(pwd)/DownloadSamples/*
@@ -44,5 +44,5 @@ do
     continue
   fi
 
-  echo "$(pwd)/Scripts/multipipeline_step2 $f" >> CommandsToExecute/multipipeline_step2
+  echo "$(pwd)/scripts/multipipeline_step2 $f" >> CommandsToExecute/multipipeline_step2
 done

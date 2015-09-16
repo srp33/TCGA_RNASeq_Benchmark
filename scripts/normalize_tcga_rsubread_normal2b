@@ -36,4 +36,4 @@ done
 fastqFilePath1=$(head -n 1 $fastqFileNamesFile)
 fastqFilePath2=$(head -n 2 $fastqFileNamesFile | tail -n 1)
 
-echo "Rscript --vanilla $currentDir/Codes/ProcessRnaSeqFeatureCounts2.R $currentDir/Genome/iGenomes_2012/genome.fa $fastqFilePath1 $fastqFilePath2 $currentDir/Genome/iGenomes_2012/genes.gtf $fastqDir/$tcgaID $outFpkmDir/$tcgaID $outTpmDir/$tcgaID $outFeatureCountsDir/$tcgaID $outStatsDir/$tcgaID; rm -rfv $fastqDir/${tcgaID}*; rm -fv $inProgressFile" >> $outCommandFile
+echo "Rscript --vanilla $currentDir/code/ProcessRnaSeqFeatureCounts2.R $currentDir/Genome/iGenomes_2012/genome.fa $fastqFilePath1 $fastqFilePath2 $currentDir/Genome/iGenomes_2012/genes.gtf $fastqDir/$tcgaID $outFpkmDir/$tcgaID $outTpmDir/$tcgaID $outFeatureCountsDir/$tcgaID $outStatsDir/$tcgaID; rm -rfv $fastqDir/${tcgaID}*; rm -fv $inProgressFile" >> $outCommandFile

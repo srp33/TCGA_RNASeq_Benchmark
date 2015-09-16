@@ -8,7 +8,7 @@
 
 #rm -rfv DownloadSamplesNormal/* CancerTypesNormal/*
 
-#python Codes/ParseCgHubQueryResults.py Query_Normal.xml "" DownloadSamplesNormal CancerTypesNormal
+#python code/ParseCgHubQueryResults.py Query_Normal.xml "" DownloadSamplesNormal CancerTypesNormal
 
 #rm -rf TempNormal/*
 
@@ -30,5 +30,5 @@ do
     continue
   fi
 
-  $(pwd)/Scripts/normalize_tcga_rsubread_normal2a $f temp_parallel_normalb temp_parallel_normal
+  $(pwd)/scripts/normalize_tcga_rsubread_normal2a $f temp_parallel_normalb temp_parallel_normal
 done

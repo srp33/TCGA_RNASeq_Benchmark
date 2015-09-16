@@ -18,4 +18,4 @@ cgquery -o $currentDir/XmlFiles/$sampleID.xml -a "state=live&library_strategy=RN
 gtdownload -vv -d $currentDir/XmlFiles/$sampleID.xml -c $currentDir/cghub.key --max-children 9 -p $fastqDir
 rm -fv $currentDir/XmlFiles/$sampleID.xml
 
-echo "./Scripts/multipipeline_step3 $sampleID $analysisID $fastqDir/$analysisID" >> CommandsToExecute/multipipeline_step3
+echo "./scripts/multipipeline_step3 $sampleID $analysisID $fastqDir/$analysisID" >> CommandsToExecute/multipipeline_step3

@@ -5,6 +5,6 @@ set -o errexit
 bamFile=$1
 
 sampleID=$(basename ${bamFile/\.bam/})
-singleOrPaired=$(/usr/bin/python Codes/single_or_paired.py $bamFile)
+singleOrPaired=$(/usr/bin/python code/single_or_paired.py $bamFile)
 
 echo $singleOrPaired
