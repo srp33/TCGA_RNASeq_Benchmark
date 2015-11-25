@@ -15,7 +15,7 @@ outDirPath = commandArgs()[14]
 orientation = commandArgs()[15]
 
 memory = 8000
-nthreads = 12
+nthreads = 2
 
 input_format = "gzFASTQ"
 if (file_ext(inFilePath1) == "bam")

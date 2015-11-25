@@ -70,7 +70,8 @@ do
   python code/ParseKallistoValues.py EduardoEyras/Kallisto/$ref
 done
 
-for cancerType in KICH
+#for cancerType in SARC KICH
+for cancerType in SARC
 do
   matricize EduardoEyras/Transcript/FeatureCounts $cancerType matrices/UCSC_Transcript_Counts_Rsubread_${cancerType}.txt
   matricize EduardoEyras/Transcript/TPM $cancerType matrices/UCSC_Transcript_TPM_Rsubread_${cancerType}.txt

@@ -7,6 +7,12 @@ fastqFile2="$2"
 
 sampleID=$(basename ${fastqFile1/_1\.fq/})
 
+if [ -f EduardoEyras/Kallisto/GENCODE/$sampleID/abundance.tsv ]
+then
+  echo $sampleID already processed to the end
+  exit 0
+fi
+
 mkdir -pv BAMtemp
 rm -rfv BAMtemp/${sampleID}
 
@@ -61,4 +67,9 @@ then
   fi
 fi
 
+mkdir -pv Triche/Kallisto Triche/PseudoBAM
+tricheFastaIndexFile=/Data/Genomes/ERCC_Homo_sapiens.GRCh38.EnsV80.cdna.all_Homo_sapiens.GRCh38.EnsV80.ncrna_Homo_sapiens.RepBase.20_05.humrep_Homo_sapiens.RepBase.20_05.humsub.fa.idx
+/Software/kallisto/build/src/kallisto quant -i $tricheFastaIndexFile -b 100 -t 2 --pseudobam -o Triche/Kallisto/$sampleID $fastqFile1 $fastqFile2 | /Software/samtools-1.2/samtools view -Sb - > Triche/PseudoBAM/$sampleID.bam
+
+rm -fv EduardoEyras/Kallisto/*/$sampleID/abundance.h5
 rm -rfv $fastqFile1 $fastqFile2

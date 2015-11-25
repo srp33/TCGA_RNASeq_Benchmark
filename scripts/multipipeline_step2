@@ -10,12 +10,28 @@ analysisID=$(cat $sampleIDFile)
 currentDir=$(pwd)
 fastqDir=$currentDir/Temp/FASTQ
 
+if [ -f $currentDir/FASTQ/${sampleID}_1.fq ]
+then
+  echo $sampleID FASTQ files already downloaded and extracted
+  exit 0
+fi
+
+if [ -f $currentDir/EduardoEyras/Kallisto/GENCODE/$sampleID/abundance.tsv ]
+then
+  echo $sampleID already processed to the end
+  exit 0
+fi
+
+rm -frv $fastqDir/$analysisID
+rm -fv $fastqDir/$analysisID.gto
+rm -fv $fastqDir/$analysisID.partial
+
 mkdir -p $fastqDir
 
 echo Downloading $sampleID
 mkdir -p $currentDir/XmlFiles
 cgquery -o $currentDir/XmlFiles/$sampleID.xml -a "state=live&library_strategy=RNA-Seq&filetype=fasta&analysis_id=${analysisID}"
-gtdownload -vv -d $currentDir/XmlFiles/$sampleID.xml -c $currentDir/cghub.key --max-children 9 -p $fastqDir
+gtdownload -vv -d $currentDir/XmlFiles/$sampleID.xml -c $currentDir/cghub.key --max-children 2 -p $fastqDir
 rm -fv $currentDir/XmlFiles/$sampleID.xml
 
-echo "./scripts/multipipeline_step3 $sampleID $analysisID $fastqDir/$analysisID" >> CommandsToExecute/multipipeline_step3
+echo "$currentDir/scripts/multipipeline_step3 $sampleID $analysisID $fastqDir/$analysisID" >> $currentDir/CommandsToExecute/multipipeline_step3

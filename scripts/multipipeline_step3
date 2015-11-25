@@ -8,33 +8,46 @@ fastqDir=$3
 
 currentDir=$(pwd)
 
+if [ ! -f $fastqDir ]
+then
+  echo $fastqDir does not exist. It may have been a partial download or may have already been processed.
+  exit 0
+fi
+
 if [ -f FASTQ/${sampleID}_1.fq ]
 then
   echo FASTQ/${sampleID}_1.fq already exists
   exit 0
 fi
 
-function cleanup {
-  rm -rfv $fastqDir
-  rm -rfv $fastqDir.gto
-}
+if [ -f EduardoEyras/Kallisto/GENCODE/$sampleID/abundance.tsv ]
+then
+  echo $sampleID already processed to the end
+  exit 0
+fi
 
-trap 'cleanup' TERM INT EXIT
+#function cleanup {
+#  rm -rfv $fastqDir
+#  rm -rfv $fastqDir.gto
+#}
+
+#trap 'cleanup' TERM INT EXIT
 
 mkdir -p $fastqDir/$sampleID
 
 if [ -f $fastqDir/*.tar.gz ]
 then
   echo Rename and extract $fastqDir/*.tar.gz
-  mv -v $fastqDir/*.tar.gz $fastqDir/$sampleID.tar.gz
-  tar -zxvf $fastqDir/$sampleID.tar.gz -C $fastqDir/$sampleID
-  rm -fv $fastqDir/$sampleID.tar.gz
+#  mv -v $fastqDir/*.tar.gz $fastqDir/$sampleID.tar.gz
+#  tar -zxvf $fastqDir/$sampleID.tar.gz -C $fastqDir/$sampleID
+#  rm -fv $fastqDir/$sampleID.tar.gz
 else
   echo Rename and extract $fastqDir/*.tar
-  mv -v $fastqDir/*.tar $fastqDir/$sampleID.tar
-  tar -xvf $fastqDir/$sampleID.tar -C $fastqDir/$sampleID
-  rm -fv $fastqDir/$sampleID.tar
+#  mv -v $fastqDir/*.tar $fastqDir/$sampleID.tar
+#  tar -xvf $fastqDir/$sampleID.tar -C $fastqDir/$sampleID
+#  rm -fv $fastqDir/$sampleID.tar
 fi
+exit
 
 fastqFileNamesFile=$fastqDir/$sampleID/FASTQFiles
 for f in $fastqDir/$sampleID/*fastq* NULL
