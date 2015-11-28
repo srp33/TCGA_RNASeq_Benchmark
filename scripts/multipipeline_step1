@@ -1,20 +1,20 @@
 #!/bin/bash
 
-set -o errexit
+#set -o errexit
 
 mkdir -p DownloadSamples CancerTypes Temp FeatureCounts InProgress
 
-rm -rfv DownloadSamples/*
+#rm -rfv DownloadSamples/*
 ##rm -rfv CancerTypes/*
-rm -rfv Temp/*
-rm -rfv BAMtemp/*
-rm -rfv FASTQ/*
-rm -fv CommandsToExecute/multipipeline_step2
-rm -fv CommandsToExecute/multipipeline_step3
-rm -fv CommandsToExecute/multipipeline_step4
+#rm -rfv Temp/*
+#rm -rfv BAMtemp/*
+#rm -rfv FASTQ/*
+#rm -fv CommandsToExecute/multipipeline_step2
+#rm -fv CommandsToExecute/multipipeline_step3
+#rm -fv CommandsToExecute/multipipeline_step4
 
 #for cancerType in BRCA COAD HNSC KICH KIRC KIRP LIHC LUAD LUSC OV PRAD SKCM THCA
-for cancerType in LAML
+#for cancerType in LAML
 #for cancerType in BRCA
 #for cancerType in KIRC
 #for cancerType in KIRP
@@ -23,29 +23,31 @@ for cancerType in LAML
 #for cancerType in HNSC
 #for cancerType in SKCM
 #for cancerType in COAD
+#do
+#  cgquery -o Query_${cancerType}.xml -a "state=live&library_strategy=RNA-Seq&filetype=fasta&sample_type=0*&study=phs000178&disease_abbr=${cancerType}"
+#  python code/ParseCgHubQueryResults.py Query_${cancerType}.xml "" DownloadSamples CancerTypes
+#done
+
+for i in {1..100}
 do
-  cgquery -o Query_${cancerType}.xml -a "state=live&library_strategy=RNA-Seq&filetype=fasta&sample_type=0*&study=phs000178&disease_abbr=${cancerType}"
-  #cgquery -o Query_${cancerType}.xml -a "state=live&library_strategy=RNA-Seq&filetype=fasta&sample_type=0*&study=phs000178&disease_abbr=${cancerType}&sample_type=06"
-  python code/ParseCgHubQueryResults.py Query_${cancerType}.xml "" DownloadSamples CancerTypes
-done
+  for f in $(pwd)/DownloadSamples/*
+  do
+    sampleID=$(basename $f)
+    sampleID=${sampleID/\.xml/}
+    analysisID=$(cat $f)
 
-for f in $(pwd)/DownloadSamples/*
-do
-  sampleID=$(basename $f)
-  sampleID=${sampleID/\.xml/}
-  analysisID=$(cat $f)
+#    if [ -f EduardoEyras/Kallisto/GENCODE/$sampleID/abundance.tsv ]
+#    then
+#      echo $sampleID already processed
+#      continue
+#    fi
 
-  if [ -f EduardoEyras/Kallisto/GENCODE/$sampleID/abundance.tsv ]
-  then
-    echo $sampleID already processed
-    continue
-  fi
+#    if [ -f InProgress/$sampleID ]
+#    then
+#      echo $sampleID currently being processed
+#      continue
+#    fi
 
-  if [ -f InProgress/$sampleID ]
-  then
-    echo $sampleID currently being processed
-    continue
-  fi
-
-  echo "$(pwd)/scripts/multipipeline_step2 $f" >> CommandsToExecute/multipipeline_step2
+    $(pwd)/scripts/multipipeline_step2 $f
+  done
 done

@@ -9,10 +9,13 @@ analysisID=$(cat $sampleIDFile)
 
 currentDir=$(pwd)
 fastqDir=$currentDir/Temp/FASTQ
+outFastqDir=$currentDir/FASTQ/$sampleID
 
-if [ -f $currentDir/FASTQ/${sampleID}_1.fq ]
+numFastqFiles=$(python code/PrintNumMatchingFiles.py "$outFastqDir/*fastq*")
+
+if [ "$numFastqFiles" -gt "0" ]
 then
-  echo $sampleID FASTQ files already downloaded and extracted
+  echo FASTQ files have already been extracted to $outFastqDir.
   exit 0
 fi
 
@@ -22,16 +25,21 @@ then
   exit 0
 fi
 
-rm -frv $fastqDir/$analysisID
-rm -fv $fastqDir/$analysisID.gto
-rm -fv $fastqDir/$analysisID.partial
+function cleanup {
+  rm -frv $fastqDir/$analysisID
+  rm -frv $fastqDir/$analysisID.gto
+  #rm -frv $fastqDir/$analysisID.partial
+}
+
+cleanup
+trap 'cleanup' TERM INT
 
 mkdir -p $fastqDir
 
 echo Downloading $sampleID
 mkdir -p $currentDir/XmlFiles
 cgquery -o $currentDir/XmlFiles/$sampleID.xml -a "state=live&library_strategy=RNA-Seq&filetype=fasta&analysis_id=${analysisID}"
-gtdownload -vv -d $currentDir/XmlFiles/$sampleID.xml -c $currentDir/cghub.key --max-children 2 -p $fastqDir
+gtdownload -vv -d $currentDir/XmlFiles/$sampleID.xml -c $currentDir/cghub.key --max-children 8 -p $fastqDir -k 1
 rm -fv $currentDir/XmlFiles/$sampleID.xml
 
-echo "$currentDir/scripts/multipipeline_step3 $sampleID $analysisID $fastqDir/$analysisID" >> $currentDir/CommandsToExecute/multipipeline_step3
+$currentDir/scripts/multipipeline_step3 $sampleID $analysisID $fastqDir/$analysisID

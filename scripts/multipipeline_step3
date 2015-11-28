@@ -7,16 +7,11 @@ analysisID=$2
 fastqDir=$3
 
 currentDir=$(pwd)
+outFastqDir=$currentDir/FASTQ/$sampleID
 
-if [ ! -f $fastqDir ]
+if [ ! -d $fastqDir ]
 then
   echo $fastqDir does not exist. It may have been a partial download or may have already been processed.
-  exit 0
-fi
-
-if [ -f FASTQ/${sampleID}_1.fq ]
-then
-  echo FASTQ/${sampleID}_1.fq already exists
   exit 0
 fi
 
@@ -26,45 +21,61 @@ then
   exit 0
 fi
 
-#function cleanup {
-#  rm -rfv $fastqDir
-#  rm -rfv $fastqDir.gto
-#}
+numFastqFiles=$(python code/PrintNumMatchingFiles.py "$outFastqDir/*fastq*")
 
-#trap 'cleanup' TERM INT EXIT
+if [ "$numFastqFiles" -gt "0" ]
+then
+  echo FASTQ files have already been extracted to $outFastqDir.
+  exit 0
+fi
 
-mkdir -p $fastqDir/$sampleID
+function cleanup {
+  rm -rfv $fastqDir
+  rm -rfv $fastqDir.gto
+}
+
+trap 'cleanup' TERM INT EXIT
+
+mkdir -p $outFastqDir
 
 if [ -f $fastqDir/*.tar.gz ]
 then
   echo Rename and extract $fastqDir/*.tar.gz
-#  mv -v $fastqDir/*.tar.gz $fastqDir/$sampleID.tar.gz
-#  tar -zxvf $fastqDir/$sampleID.tar.gz -C $fastqDir/$sampleID
-#  rm -fv $fastqDir/$sampleID.tar.gz
+  tar -zxvf $fastqDir/*.tar.gz -C $outFastqDir
 else
+  if [ ! -f $fastqDir/*.tar ]
+  then
+    echo No files exist to be extracted in $fastqDir.
+    exit 0
+  fi
+
   echo Rename and extract $fastqDir/*.tar
-#  mv -v $fastqDir/*.tar $fastqDir/$sampleID.tar
-#  tar -xvf $fastqDir/$sampleID.tar -C $fastqDir/$sampleID
-#  rm -fv $fastqDir/$sampleID.tar
+  tar -xvf $fastqDir/*.tar -C $outFastqDir
 fi
-exit
 
-fastqFileNamesFile=$fastqDir/$sampleID/FASTQFiles
-for f in $fastqDir/$sampleID/*fastq* NULL
-do
-  echo $f >> $fastqFileNamesFile
-done
+numFastqFiles=$(python code/PrintNumMatchingFiles.py "$outFastqDir/*fastq*")
 
-fastqFilePath1=$(head -n 1 $fastqFileNamesFile)
-fastqFilePath2=$(head -n 2 $fastqFileNamesFile | tail -n 1)
-
-mkdir -p FASTQ
-mv -v $fastqFilePath1 FASTQ/${sampleID}_1.fq
-fastqFilePath1=FASTQ/${sampleID}_1.fq
-if [ "$fastqFilePath2" != "" ]
+if [ "$numFastqFiles" == "0" ]
 then
-  mv -v $fastqFilePath2 FASTQ/${sampleID}_2.fq
-  fastqFilePath2=FASTQ/${sampleID}_2.fq
+  echo "No FASTQ files were found at $outFastqDir."
+  exit 0
 fi
 
-echo "./scripts/multipipeline_step4 $fastqFilePath1 $fastqFilePath2" >> CommandsToExecute/multipipeline_step4
+#if [ "$numFastqFiles" == "1" ]
+#then
+#  fastqFilePath1=$outFastqDir/*fastq*
+#  fastqFilePath2=
+#fi
+
+pairedEnd=$(python code/FileNamesContainText.py "_1.fastq" "$outFastqDir/*fastq*")
+
+#if [ "$pairedEnd" == "True" ]
+#then
+#  fastqFilePath1=$(python code/JoinFileNames.py "$outFastqDir/*_1.fastq*" ",")
+#  fastqFilePath2=$(python code/JoinFileNames.py "$outFastqDir/*_2.fastq*" ",")
+#else
+#  fastqFilePath1=$(python code/JoinFileNames.py "$outFastqDir/*fastq*" ",")
+#  fastqFilePath2=
+#fi
+
+echo "./scripts/multipipeline_step4 $outFastqDir $pairedEnd" >> CommandsToExecute/multipipeline_step4

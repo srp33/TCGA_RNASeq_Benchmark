@@ -2,53 +2,47 @@
 
 set -o errexit
 
-fastqFile1="$1"
-fastqFile2="$2"
+fastqDir="$1"
+isPaired="$2"
 
-sampleID=$(basename ${fastqFile1/_1\.fq/})
+sampleID=$(basename $fastqDir)
 
-if [ -f EduardoEyras/Kallisto/GENCODE/$sampleID/abundance.tsv ]
+kallistoSingleParam=
+if [ "$isPaired" != "True" ]
 then
-  echo $sampleID already processed to the end
-  exit 0
+  kallistoSingleParam="--single"
 fi
 
-mkdir -pv BAMtemp
-rm -rfv BAMtemp/${sampleID}
-
-mkdir -pv Timer/Rsubread/UCSC Timer/Salmon/UCSC Timer/Kallisto/UCSC Timer/Rsubread/UCSC
-mkdir -pv Timer/Rsubread/GENCODE Timer/Salmon/GENCODE Timer/Kallisto/GENCODE Timer/Rsubread/GENCODE
-mkdir -pv StdOut/Rsubread/UCSC StdOut/Salmon/UCSC StdOut/Kallisto/UCSC StdOut/Rsubread/UCSC
-mkdir -pv StdOut/Rsubread/GENCODE StdOut/Salmon/GENCODE StdOut/Kallisto/GENCODE StdOut/Rsubread/GENCODE
-rm -fv StdOut/Salmon/*/$sampleID StdOut/Kallisto/*/$sampleID StdOut/Rsubread/*/$sampleID
-rm -fv Timer/Salmon/*/$sampleID Timer/Kallisto/*/$sampleID Timer/Rsubread/*/$sampleID
-mkdir -pv EduardoEyras/Salmon/UCSC/$sampleID EduardoEyras/Salmon/GENCODE/$sampleID
-mkdir -pv EduardoEyras/Kallisto/UCSC/$sampleID EduardoEyras/Kallisto/GENCODE/$sampleID
-
-rm -fv BAMtemp/$sampleID.bam*
-Rscript --vanilla code/ProcessRnaSeqFeatureCounts3.R $sampleID Genome/iGenomes_2012/genome.fa "$fastqFile1" "$fastqFile2" Genome/iGenomes_2012/genes.gtf gene_id BAMtemp/$sampleID.bam iGenomes_2012/Gene
-Rscript --vanilla code/ProcessRnaSeqFeatureCounts3.R $sampleID Genome/iGenomes_2012/genome.fa "$fastqFile1" "$fastqFile2" Genome/iGenomes_2012/genes.gtf transcript_id BAMtemp/$sampleID.bam iGenomes_2012/Transcript
-Rscript --vanilla code/ProcessRnaSeqFeatureCounts3.R $sampleID Genome/iGenomes_2012/genome.fa "$fastqFile1" "$fastqFile2" Genome/iGenomes_2012/genes_plusexons.gtf exon_id BAMtemp/$sampleID.bam iGenomes_2012/Exon
-rm -fv BAMtemp/$sampleID.bam*
-
-#Rscript --vanilla code/ProcessRnaSeqSubjunc.R $sampleID Genome/iGenomes_2012/genome.fa "$fastqFile1" "$fastqFile2" BAMtemp/$sampleID.bam EduardoEyras
-#rm -fv BAMtemp/$sampleID.bam*
-
-{ time Rscript --vanilla code/ProcessRnaSeqFeatureCounts3.R $sampleID Genome/iGenomes_2012/genome.fa "$fastqFile1" "$fastqFile2" Genome/EduardoEyras/refseq_annotation_hg19.formatted.nohap.processed.gtf transcript_id BAMtemp/$sampleID.bam EduardoEyras/Transcript > StdOut/Rsubread/UCSC/$sampleID 2>&1 ; } 2> Timer/Rsubread/UCSC/$sampleID
-Rscript --vanilla code/ProcessRnaSeqFeatureCounts3.R $sampleID Genome/iGenomes_2012/genome.fa "$fastqFile1" "$fastqFile2" Genome/EduardoEyras/refseq_annotation_hg19.formatted.nohap.processed.gtf gene_id BAMtemp/$sampleID.bam EduardoEyras/Gene
-Rscript --vanilla code/ProcessRnaSeqFeatureCounts3.R $sampleID Genome/iGenomes_2012/genome.fa "$fastqFile1" "$fastqFile2" Genome/EduardoEyras/refseq_annotation_hg19.formatted.nohap.processed_plusexons.gtf exon_id BAMtemp/$sampleID.bam EduardoEyras/Exon
-rm -fv BAMtemp/$sampleID.bam*
-
-#Rscript --vanilla code/ProcessRnaSeqSubjunc.R $sampleID Genome/GENCODE_19/GRCh37.p13.genome.fa "$fastqFile1" "$fastqFile2" BAMtemp/$sampleID.bam GENCODE_19
-#rm -fv BAMtemp/$sampleID.bam*
-
-Rscript --vanilla code/ProcessRnaSeqFeatureCounts3.R $sampleID Genome/GENCODE_19/GRCh37.p13.genome.fa "$fastqFile1" "$fastqFile2" Genome/GENCODE_19/gencode.v19.annotation.gtf gene_id BAMtemp/$sampleID.bam GENCODE_19/Gene
-Rscript --vanilla code/ProcessRnaSeqFeatureCounts3.R $sampleID Genome/GENCODE_19/GRCh37.p13.genome.fa "$fastqFile1" "$fastqFile2" Genome/GENCODE_19/gencode.v19.annotation.gtf transcript_id BAMtemp/$sampleID.bam GENCODE_19/Transcript
-Rscript --vanilla code/ProcessRnaSeqFeatureCounts3.R $sampleID Genome/GENCODE_19/GRCh37.p13.genome.fa "$fastqFile1" "$fastqFile2" Genome/GENCODE_19/gencode.v19.annotation_plusexons.gtf exon_id BAMtemp/$sampleID.bam GENCODE_19/Exon
-rm -fv BAMtemp/$sampleID.bam*
+if [ ! -f Triche/Kallisto/$sampleID/abundance.tsv ]
+then
+  mkdir -pv Triche/Kallisto Triche/PseudoBAM
+  tricheFastaIndexFile=/Data/Genomes/ERCC_Homo_sapiens.GRCh38.EnsV80.cdna.all_Homo_sapiens.GRCh38.EnsV80.ncrna_Homo_sapiens.RepBase.20_05.humrep_Homo_sapiens.RepBase.20_05.humsub.fa.idx
+  /Software/kallisto-0.42.2.1/build/src/kallisto quant -i $tricheFastaIndexFile -b 100 -t 6 --pseudobam -o Triche/Kallisto/$sampleID $fastqDir/* $kallistoSingleParam | /Software/samtools-1.2/samtools view -Sb - > Triche/PseudoBAM/$sampleID.bam
+fi
 
 if [ ! -f EduardoEyras/Kallisto/GENCODE/$sampleID/abundance.tsv ]
 then
+  mkdir -pv EduardoEyras/Kallisto/UCSC/$sampleID EduardoEyras/Kallisto/GENCODE/$sampleID
+  mkdir -pv Timer/Kallisto/UCSC Timer/Kallisto/GENCODE
+  mkdir -pv StdOut/Kallisto/UCSC StdOut/Kallisto/GENCODE
+  rm -fv StdOut/Kallisto/*/$sampleID Timer/Kallisto/*/$sampleID
+
+  { time /Software/kallisto/build/src/kallisto quant -i Genome/EduardoEyras/refseq_sequence_mrna_Nov2014_kallisto -b 30 -t 6 -o EduardoEyras/Kallisto/UCSC/$sampleID $fastqDir/* $kallistoSingleParam > StdOut/Kallisto/UCSC/$sampleID 2>&1 ; } 2> Timer/Kallisto/UCSC/$sampleID
+  { time /Software/kallisto/build/src/kallisto quant -i Genome/GENCODE_19/gencode.v19.pc_lncRNA_transcripts_kallisto -b 30 -t 6 -o EduardoEyras/Kallisto/GENCODE/$sampleID $fastqDir/* $kallistoSingleParam > StdOut/Kallisto/GENCODE/$sampleID 2>&1 ; } 2> Timer/Kallisto/GENCODE/$sampleID
+fi
+
+
+  mkdir -pv EduardoEyras/Kallisto/UCSC/$sampleID EduardoEyras/Kallisto/GENCODE/$sampleID
+  mkdir -pv EduardoEyras/Salmon/UCSC/$sampleID EduardoEyras/Salmon/GENCODE/$sampleID
+  mkdir -pv Timer/Kallisto/UCSC Timer/Salmon/UCSC
+  mkdir -pv Timer/Kallisto/GENCODE Timer/Salmon/GENCODE
+  mkdir -pv StdOut/Kallisto/UCSC StdOut/Salmon/UCSC
+  mkdir -pv StdOut/Kallisto/GENCODE StdOut/Salmon/GENCODE
+
+  rm -fv StdOut/Salmon/*/$sampleID StdOut/Kallisto/*/$sampleID
+  rm -fv Timer/Salmon/*/$sampleID Timer/Kallisto/*/$sampleID
+
+
   if [ "$fastqFile2" == "" ]
   then
     echo "Running Salmon for $sampleID (single-end reads)"
@@ -66,10 +60,7 @@ then
     { time /Software/kallisto/build/src/kallisto quant -i Genome/GENCODE_19/gencode.v19.pc_lncRNA_transcripts_kallisto -b 30 -t 2 -o EduardoEyras/Kallisto/GENCODE/$sampleID $fastqFile1 $fastqFile2 > StdOut/Kallisto/GENCODE/$sampleID 2>&1 ; } 2> Timer/Kallisto/GENCODE/$sampleID
   fi
 fi
-
-mkdir -pv Triche/Kallisto Triche/PseudoBAM
-tricheFastaIndexFile=/Data/Genomes/ERCC_Homo_sapiens.GRCh38.EnsV80.cdna.all_Homo_sapiens.GRCh38.EnsV80.ncrna_Homo_sapiens.RepBase.20_05.humrep_Homo_sapiens.RepBase.20_05.humsub.fa.idx
-/Software/kallisto/build/src/kallisto quant -i $tricheFastaIndexFile -b 100 -t 2 --pseudobam -o Triche/Kallisto/$sampleID $fastqFile1 $fastqFile2 | /Software/samtools-1.2/samtools view -Sb - > Triche/PseudoBAM/$sampleID.bam
+fi
 
 rm -fv EduardoEyras/Kallisto/*/$sampleID/abundance.h5
 rm -rfv $fastqFile1 $fastqFile2
